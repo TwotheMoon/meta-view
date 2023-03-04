@@ -165,7 +165,7 @@ function Popup() {
                 {message && <span>{message}</span>}
             </InfoContentsTapTwo>
             <InfoContents style={{gap:10, marginTop: 40}}>
-                <InfoText>if 가스비가 없다면 포셋에서 무료로 받아보세요!</InfoText>
+                <InfoText>if 가스비가 없다면 포셋에서 테스트ETH를 받아보세요!</InfoText>
                 <InfoImg style={{width: 700, height:"initial"}} src={require("../img/info_05.png").default} alt="" />
                 <a href="https://goerlifaucet.com/" target="_blank" rel="noreferrer">https://goerlifaucet.com/</a>
               </InfoContents>
