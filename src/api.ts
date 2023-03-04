@@ -1,7 +1,7 @@
 const API_KEY = "d0f275c0a96c3c0542cd3149a66bee14";
 const BASE_PATH = "https://api.themoviedb.org/3"
 
-interface IMovie {
+export interface IMovie {
     id: number;
     backdrop_path: string;
     poster_path: string;
@@ -12,6 +12,17 @@ interface IMovie {
     name?: string;
     first_air_date?: string;
 
+}
+
+export interface ITv{
+    backdrop_path: string; 
+    first_air_date: string;
+    id: number; 
+    name: string 
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    vote_count: number; 
 }
 
 export interface IGetMoviesResult {

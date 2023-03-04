@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
 import { makeImagePath } from "../../utils";
-import { getSimilarTV, IGetMoviesResult } from "../../api";
+import { getSimilarTV, IGetMoviesResult, ITv } from "../../api";
 
 
 const SliderBtn = styled.button`
@@ -258,7 +258,7 @@ function TvSliders({ data, title, sliderNum, clickSlider }: any) {
     };
     const onOverlayClick = () => history.push("/tv");
     const clickedMovie = bigMovieMatch?.params.tvId &&
-        data?.results.find((tv: any) => String(tv.id) === bigMovieMatch.params.tvId);
+        data?.results.find((tv: ITv) => String(tv.id) === bigMovieMatch.params.tvId);
 
     return (
         <>
@@ -277,7 +277,7 @@ function TvSliders({ data, title, sliderNum, clickSlider }: any) {
                     >
                         {data?.results.slice(1)
                             .slice(offset * index, offset * index + offset)
-                            .map((tv: any) => (
+                            .map((tv: ITv) => (
                                 <Box
                                     layoutId={tv.id + "" + sliderNum}
                                     key={tv.id}

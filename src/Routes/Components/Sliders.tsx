@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
-import { getSimilarMovies, IGetMoviesResult } from "../../api";
+import { getSimilarMovies, IGetMoviesResult, IMovie } from "../../api";
 import { makeImagePath } from "../../utils";
 
 const Slider = styled(motion.div)`
@@ -253,7 +253,7 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
         selectMovieId = movieId;
     };
     const onOverlayClick = () => history.push("/home");
-    const clickedMovie = bigMovieMatch?.params.movieId && data?.results.find((movie: any) => String(movie.id) === bigMovieMatch.params.movieId);
+    const clickedMovie = bigMovieMatch?.params.movieId && data?.results.find((movie: IMovie) => String(movie.id) === bigMovieMatch.params.movieId);
     return (
         <>
             <Slider>
@@ -271,7 +271,7 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
                     >
                         {data?.results.slice(1)
                             .slice(offset * index, offset * index + offset)
-                            .map((movie: any) => (
+                            .map((movie: IMovie) => (
                                 <Box
                                     layoutId={movie.id + "" + sliderNum}
                                     key={movie.id + sliderNum}
