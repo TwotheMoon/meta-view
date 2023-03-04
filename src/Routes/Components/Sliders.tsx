@@ -1,9 +1,10 @@
 import { motion, useViewportScroll, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import YouTube, { YouTubeProps } from 'react-youtube';
 import { useQuery } from "react-query";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
-import { getSimilarMovies, IGetMoviesResult, IMovie } from "../../api";
+import { getSimilarMovies, getVideo, IGetMoviesResult, IMovie } from "../../api";
 import { makeImagePath } from "../../utils";
 
 const Slider = styled(motion.div)`
@@ -224,9 +225,11 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
     const history = useHistory();
     const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
     const { data: simData } = useQuery<IGetMoviesResult>(["simMovies", selectMovieId], () => getSimilarMovies(selectMovieId));
+    const { data: videoData } = useQuery<IGetMoviesResult>(["videos", selectMovieId], () => getVideo(selectMovieId));
     const [index, setIndex] = useState(0);
     const [leaving, setLeaving] = useState(false);
     const [back, setBack] = useState(false);
+
     const increaseIndex = () => {
         if (data) {
             if (leaving) return;
@@ -254,6 +257,23 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
     };
     const onOverlayClick = () => history.push("/home");
     const clickedMovie = bigMovieMatch?.params.movieId && data?.results.find((movie: IMovie) => String(movie.id) === bigMovieMatch.params.movieId);
+    
+    if(videoData?.results){
+        console.log(videoData.results[0].key)
+    }
+
+    const onPlayerReady: YouTubeProps['onReady'] = (event) => {
+        event.target.pauseVideo();
+    }
+    
+    const opts: YouTubeProps['opts'] = {
+        height: "390",
+        width: "100%",
+        playerVars: {
+        autoplay: 1,
+        },
+    };
+
     return (
         <>
             <Slider>
@@ -304,7 +324,11 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
                         >
                             {clickedMovie &&
                                 <>
+                                    {videoData?.results[0] ? 
+                                    <YouTube videoId={videoData.results[0].key} opts={opts} onReady={onPlayerReady} />
+                                    :
                                     <BigCover style={{ backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(clickedMovie.backdrop_path, "w500")})` }} />
+                                     }
                                     <IconWrap>
                                         <Icons>
                                             <IconCircle>

@@ -44,6 +44,7 @@ function Home() {
     const { data: topLated } = useQuery<IGetMoviesResult>(["topLatedMovies", "topLated"], getTopRatedMovies);
     const { data: upComing } = useQuery<IGetMoviesResult>(["upComingMovies", "upComing"], getUpcomingMovies);
     const [clickSlider, setClickSlider] = useState(0);
+    
 
     return (
         <Wrapper>{isLoading ? (

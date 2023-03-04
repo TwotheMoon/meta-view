@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { Link, Route, useHistory, useRouteMatch } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.nav)`
@@ -108,9 +108,6 @@ interface IForm {
 function Header() {
     const homeMatch = useRouteMatch("/home");
     const tvMatch = useRouteMatch("/tv");
-    const startMatch = useRouteMatch("/");
-    const signInMatch = useRouteMatch("/signIn");
-    const signUpMatch = useRouteMatch("/signUp");
     const [searchOpen, setSearchOpen] = useState(false);
     const inputAnimation = useAnimation();
     const navAnimation = useAnimation();
@@ -190,18 +187,7 @@ function Header() {
                     />
                 </Search>
                 <Route>
-                    {homeMatch || tvMatch || startMatch?.isExact || signUpMatch ?
-                        <Link to="signIn">
-                            <SignupBtn color="red">로그인</SignupBtn>
-                        </Link>
-                        :
-                        null
-                    }
-                    {signInMatch &&
-                        <Link to="signUp">
-                            <SignupBtn>회원가입</SignupBtn>
-                        </Link>
-                    }
+                    <SignupBtn color="red">지갑 연결</SignupBtn>
                 </Route>
             </Col>
         </Nav >
