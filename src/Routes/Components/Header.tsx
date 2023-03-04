@@ -29,8 +29,8 @@ const Col = styled.div`
 const Logo = styled(motion.div)`
   margin-right: 50px;
   img{
-    width: 100px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
 }
 `;
 const Items = styled.ul`
@@ -174,7 +174,7 @@ function Header() {
             <Col>
                 <Link to="/home">
                     <Logo>
-                        <img alt="logo" src={`${process.env.PUBLIC_URL}/asset/monviewLogoVer2.png`} />
+                        <img alt="Meta Moon" src={require("../../img/logoImg.png").default}  />
                     </Logo>
                 </Link>
                 <Items>

@@ -7,9 +7,13 @@ import styled from "styled-components";
 import { getSimilarMovies, getVideo, IGetMoviesResult, IMovie } from "../../api";
 import { makeImagePath } from "../../utils";
 import { useWeb3React } from "@web3-react/core";
-import { connectMM, switchNetworkToWallet } from "../../web3/web3";
-import { useSetRecoilState } from "recoil";
+import { callApprove, callBuyMovie, connectMM, getBalance, switchNetworkToWallet } from "../../web3/web3";
+import { useRecoilState } from "recoil";
 import { balanceAtom } from "../../atom";
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+
 
 const Slider = styled(motion.div)`
     margin-top: 80px;
@@ -238,8 +242,8 @@ const BuyBtn = styled.div`
 const offset = 6;
 let selectMovieId = 0;
 function Sliders({ data, title, sliderNum, clickSlider }: any) {
-    const {active, chainId, activate} = useWeb3React();
-    const setBalance = useSetRecoilState(balanceAtom);
+    const {active, chainId, activate, account} = useWeb3React();
+    const [balance, setBalance] = useRecoilState(balanceAtom);
     const { scrollY } = useViewportScroll();
     const history = useHistory();
     const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
@@ -248,6 +252,9 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
     const [index, setIndex] = useState(0);
     const [leaving, setLeaving] = useState(false);
     const [back, setBack] = useState(false);
+    const [pending, setPending] = useState(false);
+    const [alert, setAlert] = useState(false);
+    const [warning, setWarning] = useState(false);
 
     const increaseIndex = () => {
         if (data) {
@@ -288,6 +295,30 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
         autoplay: 1,
         },
     };
+
+    const buyMovie = async () => {
+        setPending(true);
+
+        if(Number(balance) <= 12){
+            setWarning(true);
+            setPending(false);
+            return
+        }
+        await callApprove(account).then( async (res) => {
+            if(res){
+                if(res.status === true){
+                    await callBuyMovie(account).then(res => {
+                        getBalance(account, setBalance);
+                        console.log("최종", res);
+                        if(res.status === true){
+                            setAlert(true);
+                        }
+                    });
+                }
+            }
+        });
+        setPending(false);
+    }
 
     return (
         <>
@@ -349,11 +380,38 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
                                         </>
                                     }
                                     <BigTitle>{clickedMovie.title}</BigTitle>
-                                    {(active && chainId === 5) && <BuyBtn>구매하기</BuyBtn>} 
+                                    {(active && chainId === 5) && 
+                                        <BuyBtn onClick={buyMovie}>
+                                            {pending ?
+                                                <CircularProgress size={25}/>
+                                                :
+                                                "구매하기 12 NMC"
+                                            }
+                                        </BuyBtn>} 
                                     {(active && chainId !== 5) && <BuyBtn onClick={switchNetworkToWallet}>네트워크를 변경해 주세요</BuyBtn>} 
                                     {(!active) && <BuyBtn onClick={() => {
                                         connectMM(activate, setBalance, history)
-                                    }} >지갑을 연결해 주세요</BuyBtn>} 
+                                    }} >지갑을 연결
+                                    해 주세요</BuyBtn>} 
+                                    
+                                    {alert ?
+                                        <Alert onClose={() => {setAlert(false)}} severity="success">
+                                            <AlertTitle>Success</AlertTitle>
+                                            정상적으로 구입 했어요!
+                                        </Alert>
+                                        :
+                                        null
+                                    }
+
+                                    {warning ?
+                                        <Alert onClose={() => {setWarning(false)}} severity="error">
+                                            <AlertTitle>Error</AlertTitle>
+                                            NMC 잔액이 부족해요!
+                                        </Alert>
+                                        :
+                                        null
+                                    }
+
                                     <IconWrap>
                                         <Icons>
                                             <IconCircle>
@@ -389,6 +447,7 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
                     null
                 }
             </AnimatePresence>
+           
         </>
     );
 }

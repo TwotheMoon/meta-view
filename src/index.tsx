@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import '@fortawesome/fontawesome-free/js/all.js'
 import { Web3Provider } from '@ethersproject/providers';
 import { Web3ReactProvider } from '@web3-react/core';
+import { ThemeProvider as MuiProvider, createTheme } from '@mui/material/styles';
 
 const GlobalStyle = createGlobalStyle`
 html, body, div, span, applet, object, iframe,
@@ -30,7 +31,6 @@ time, mark, audio, video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
-
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
@@ -86,15 +86,24 @@ const client = new QueryClient();
 
 const getLibrary = (provider: any) => new Web3Provider(provider);
 
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
+
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
       <QueryClientProvider client={client}>
         <ThemeProvider theme={theme}>
-          <GlobalStyle />
-          <Web3ReactProvider getLibrary={getLibrary}>
-          <App />
-          </Web3ReactProvider>
+            <MuiProvider theme={darkTheme}>
+              <GlobalStyle />
+              <Web3ReactProvider getLibrary={getLibrary}>
+              <App />
+            </Web3ReactProvider>
+          </MuiProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </RecoilRoot>

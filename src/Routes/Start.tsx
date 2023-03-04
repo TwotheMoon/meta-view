@@ -88,7 +88,7 @@ function Start() {
             <Section>
                 <BgImg src={require("../img/loginBg.jpg").default} alt="" />
                 <LogoImg src={require("../img/logoImg.png").default} alt="" />
-                <Title>탈중앙화 Meta View를 이용해 볼까요?</Title>
+                <Title>탈중앙화 Meta View를 시작해 볼까요?</Title>
                 <BoxWrap>
                     <Link to={"/home"}>
                         <EnterBox variants={hoverVariants} initial="init" whileHover="hover">
