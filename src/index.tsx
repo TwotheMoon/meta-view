@@ -7,6 +7,8 @@ import { theme } from "./theme";
 import { createGlobalStyle } from "styled-components";
 import { QueryClient, QueryClientProvider } from "react-query";
 import '@fortawesome/fontawesome-free/js/all.js'
+import { Web3Provider } from '@ethersproject/providers';
+import { Web3ReactProvider } from '@web3-react/core';
 
 const GlobalStyle = createGlobalStyle`
 html, body, div, span, applet, object, iframe,
@@ -82,13 +84,17 @@ a {
 `;
 const client = new QueryClient();
 
+const getLibrary = (provider: any) => new Web3Provider(provider);
+
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
       <QueryClientProvider client={client}>
         <ThemeProvider theme={theme}>
           <GlobalStyle />
+          <Web3ReactProvider getLibrary={getLibrary}>
           <App />
+          </Web3ReactProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </RecoilRoot>

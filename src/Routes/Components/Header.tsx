@@ -1,8 +1,12 @@
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
-import { Link, Route, useHistory, useRouteMatch } from "react-router-dom";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useWeb3React } from "@web3-react/core";
+import { useRecoilState} from "recoil";
+import { balanceAtom } from "../../atom";
+import { connectMM, getBalance, shortAddress, switchNetworkToWallet } from "../../web3/web3";
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -88,10 +92,12 @@ const navVariants = {
     },
 }
 const SignupBtn = styled(motion.button)`  
+    font-family: "GmarketSansMedium";
     font-weight: bold;
     width: 100px;
     height: 30px;
     margin-left: 20px;
+    margin-right: 10px;
     border: none;
     border-radius: 20px;
     cursor: pointer;
@@ -101,11 +107,29 @@ const SignupBtn = styled(motion.button)`
     }
 `;
 
+const UserBalance = styled.div`
+    font-family: "GmarketSansMedium";
+    font-weight: bold;
+    padding-top: 5px;
+    padding-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+const Symbole = styled.img`
+    width: 30px;
+    margin-left: 5px;
+`;
+
 interface IForm {
     keyword: string;
 }
 
+
 function Header() {
+    const { account, active, chainId, activate } = useWeb3React();
+    const [balance, setBalance] = useRecoilState(balanceAtom);
     const homeMatch = useRouteMatch("/home");
     const tvMatch = useRouteMatch("/tv");
     const [searchOpen, setSearchOpen] = useState(false);
@@ -134,6 +158,14 @@ function Header() {
     const onVaild = (data: IForm) => {
         history.push(`/search?keyword=${data.keyword}`);
     }
+
+    useEffect(() => {
+        if(account){
+            getBalance(account, setBalance)
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [account]);
+
     return (
         <Nav
             variants={navVariants}
@@ -186,9 +218,21 @@ function Header() {
                         placeholder="원하는 제목, 장르, 배우를 검색해보세요!"
                     />
                 </Search>
-                <Route>
-                    <SignupBtn color="red">지갑 연결</SignupBtn>
-                </Route>
+                {(account && chainId === 5) && <SignupBtn color="red">{shortAddress(account)}</SignupBtn>}
+                {(account && chainId !== 5) && <SignupBtn onClick={switchNetworkToWallet} color="red" style={{width: "130px"}}>잘못된 네트워크</SignupBtn>}
+                {(!active) && <SignupBtn color="red" onClick={() => {
+                    connectMM(activate, setBalance, history)
+                }}>
+                    지갑 연결
+                </SignupBtn>}
+                {active ?
+                <UserBalance>잔액: {Number(balance).toFixed(2)} 
+                    <Symbole src={require("../../img/logoImg.png").default} alt="NMC" />
+                </UserBalance>
+                :
+                null
+                }
+                
             </Col>
         </Nav >
     );

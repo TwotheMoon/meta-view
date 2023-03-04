@@ -1,27 +1,20 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Header from "./Routes/Components/Header";
 import Home from "./Routes/Home";
+import Popup from "./Routes/Popup";
 import Search from "./Routes/Search";
-import SignIn from "./Routes/SignIn";
-import SignUp from "./Routes/SignUp";
 import Start from "./Routes/Start";
 import Tv from "./Routes/Tv";
 
 function App() {
+
+
   return (
     <Router>
       <Switch>
         <Route path="/search">
           <Header />
           <Search />
-        </Route>
-        <Route path="/signUp">
-          <Header />
-          <SignUp />
-        </Route>
-        <Route path="/signIn">
-          <Header />
-          <SignIn />
         </Route>
         <Route path={["/tv", "/tv/:tvId"]}>
           <Header />
@@ -35,6 +28,7 @@ function App() {
           <Start />
         </Route>
       </Switch>
+      <Popup />
     </Router>
   );
 }

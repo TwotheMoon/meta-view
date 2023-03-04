@@ -6,6 +6,10 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
 import { getSimilarMovies, getVideo, IGetMoviesResult, IMovie } from "../../api";
 import { makeImagePath } from "../../utils";
+import { useWeb3React } from "@web3-react/core";
+import { connectMM, switchNetworkToWallet } from "../../web3/web3";
+import { useSetRecoilState } from "recoil";
+import { balanceAtom } from "../../atom";
 
 const Slider = styled(motion.div)`
     margin-top: 80px;
@@ -131,17 +135,15 @@ const BigCover = styled.div`
 `;
 const BigTitle = styled.h3`
     color: ${(props) => props.theme.white.lighter};
-    padding: 20px;
+    padding: 10px;
+    padding-left: 20px;
     font-size: 30px;
-    position: relative;
-    top: -130px;
     `;
 const IconWrap = styled.div`
     padding-top: 10px;
-    padding-left: 10px;
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     font-size: 20px;
     `;
@@ -182,22 +184,16 @@ const BigInfo = styled.span`
 const BigOverview = styled.p`
     padding: 20px;
     color: ${(props) => props.theme.white.lighter};
-    top: -80px;
-    position: relative;
 `;
 const SimWrap = styled.div`
     display: flex;
     width: 100%;
     margin-top: 10px;
-    position: relative;
-    top: -70px;
 `;
 const SimInfo = styled.span`
     font-family: "GmarketSansMedium";
     font-weight: bold;
     padding-left: 10px;
-    position: relative;
-    top: -70px;
 `;
 const SimCover = styled.div`
     width: 100%;
@@ -217,10 +213,33 @@ const SimTitle = styled.div`
     margin: 0 auto;
     text-align: center;
 `;
+const BuyBtn = styled.div`
+    width: 90%;
+    font-size: 15px;
+    font-family: "GmarketSansLight";
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px auto;
+
+    transition-duration: 0.3s;
+    &:hover{
+        background-color: orange;
+        color: black;
+    }
+`;
 
 const offset = 6;
 let selectMovieId = 0;
 function Sliders({ data, title, sliderNum, clickSlider }: any) {
+    const {active, chainId, activate} = useWeb3React();
+    const setBalance = useSetRecoilState(balanceAtom);
     const { scrollY } = useViewportScroll();
     const history = useHistory();
     const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
@@ -258,12 +277,8 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
     const onOverlayClick = () => history.push("/home");
     const clickedMovie = bigMovieMatch?.params.movieId && data?.results.find((movie: IMovie) => String(movie.id) === bigMovieMatch.params.movieId);
     
-    if(videoData?.results){
-        console.log(videoData.results[0].key)
-    }
-
     const onPlayerReady: YouTubeProps['onReady'] = (event) => {
-        event.target.pauseVideo();
+        event.target.playVideo();
     }
     
     const opts: YouTubeProps['opts'] = {
@@ -324,11 +339,21 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
                         >
                             {clickedMovie &&
                                 <>
-                                    {videoData?.results[0] ? 
-                                    <YouTube videoId={videoData.results[0].key} opts={opts} onReady={onPlayerReady} />
-                                    :
-                                    <BigCover style={{ backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(clickedMovie.backdrop_path, "w500")})` }} />
-                                     }
+                                    {videoData?.results &&
+                                        <>
+                                            {videoData?.results.length > 0 ? 
+                                                <YouTube videoId={videoData?.results[0].key} opts={opts} onReady={onPlayerReady} />
+                                                :
+                                                <BigCover style={{ backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(clickedMovie.backdrop_path, "w500")})` }} />
+                                            }
+                                        </>
+                                    }
+                                    <BigTitle>{clickedMovie.title}</BigTitle>
+                                    {(active && chainId === 5) && <BuyBtn>구매하기</BuyBtn>} 
+                                    {(active && chainId !== 5) && <BuyBtn onClick={switchNetworkToWallet}>네트워크를 변경해 주세요</BuyBtn>} 
+                                    {(!active) && <BuyBtn onClick={() => {
+                                        connectMM(activate, setBalance, history)
+                                    }} >지갑을 연결해 주세요</BuyBtn>} 
                                     <IconWrap>
                                         <Icons>
                                             <IconCircle>
@@ -346,7 +371,7 @@ function Sliders({ data, title, sliderNum, clickSlider }: any) {
                                             <span>평점:</span> {clickedMovie.vote_average}
                                         </BigInfo>
                                     </IconWrap>
-                                    <BigTitle>{clickedMovie.title}</BigTitle>
+                                    
                                     <BigOverview>{clickedMovie.overview}</BigOverview>
                                 </>
                             }

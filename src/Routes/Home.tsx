@@ -1,7 +1,10 @@
 import { useState } from "react";
+import Button from '@mui/material/Button';
 import { useQuery } from "react-query";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { getMovies, getPopularMovies, getTopRatedMovies, getUpcomingMovies, IGetMoviesResult } from "../api";
+import { popupAtom } from "../atom";
 import { makeImagePath } from "../utils";
 import Sliders from "./Components/Sliders";
 
@@ -36,7 +39,12 @@ const Overview = styled.p`
     font-family: "GmarketSansLight";
 `;
 const SliderWrap = styled.div``;
+const PopUpBtn = styled(Button)`
+    position: fixed !important;
+    right: 10px;
+    top: 90px;
 
+`;
 
 function Home() {
     const { data, isLoading } = useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getMovies);
@@ -44,7 +52,9 @@ function Home() {
     const { data: topLated } = useQuery<IGetMoviesResult>(["topLatedMovies", "topLated"], getTopRatedMovies);
     const { data: upComing } = useQuery<IGetMoviesResult>(["upComingMovies", "upComing"], getUpcomingMovies);
     const [clickSlider, setClickSlider] = useState(0);
-    
+    const setPopup = useSetRecoilState(popupAtom);
+
+
 
     return (
         <Wrapper>{isLoading ? (
@@ -67,6 +77,9 @@ function Home() {
                 <SliderWrap onClick={() => setClickSlider(4)}>
                     <Sliders data={popular} title="Popular Movies" sliderNum={4} clickSlider={clickSlider} />
                 </SliderWrap>
+                <PopUpBtn variant="contained" onClick={() => setPopup(true)}>
+                     무료 NMC 토큰 받기
+                </PopUpBtn>
             </>
         )
         }
