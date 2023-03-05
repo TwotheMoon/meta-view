@@ -62,12 +62,11 @@ export const switchNetworkToWallet = async () => {
 
 export const getBalance = async (account: string | undefined | null, setBalance: SetterOrUpdater<string>) => {
   try {
-    if(account){
-      
+    if(account){   
+      await NMCContract.methods.balanceOf(account).call().then((token: string) => {
+        setBalance(web3.utils.fromWei(token, 'ether'));
+      });
     }
-    await NMCContract.methods.balanceOf(account).call().then((token: string) => {
-      setBalance(web3.utils.fromWei(token, 'ether'));
-    })
   } catch (error) {
     
   }

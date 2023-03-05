@@ -219,9 +219,19 @@ function Header() {
                     />
                 </Search>
                 {(account && chainId === 5) && <SignupBtn color="red">{shortAddress(account)}</SignupBtn>}
-                {(account && chainId !== 5) && <SignupBtn onClick={switchNetworkToWallet} color="red" style={{width: "130px"}}>잘못된 네트워크</SignupBtn>}
-                {(!active) && <SignupBtn color="red" onClick={() => {
-                    connectMM(activate, setBalance, history)
+
+                {(account && chainId !== 5) && 
+                <SignupBtn onClick={ async () => {
+                    await switchNetworkToWallet();
+                    getBalance( account, setBalance);
+                }} color="red" style={{width: "130px"}}>
+                    잘못된 네트워크
+                </SignupBtn>}
+                
+                {(!active) && 
+                <SignupBtn color="red" onClick={ async () => {
+                    await connectMM(activate, setBalance, history);
+                    getBalance( account, setBalance );
                 }}>
                     지갑 연결
                 </SignupBtn>}
